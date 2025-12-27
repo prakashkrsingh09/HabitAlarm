@@ -30,9 +30,9 @@ const AddActivityModal = (props: AddActivityModalProps) => {
   const [activities, setActivities] = useState<string>('');
   const [activityDescription, setActivityDescription] = useState<string>('');
   const [selectedDateRange, setSelectedDateRange] = useState(false);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [hour, setHour] = useState(23);
+  const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
   const [frequencyForNotification, setFrequencyForNotification] = useState<Frequency>('DAILY');
   const [showFrequencyMenu, setShowFrequencyMenu] = useState(false);
@@ -43,6 +43,13 @@ const AddActivityModal = (props: AddActivityModalProps) => {
     return () => {
       setStartDate('');
       setEndDate('');
+      setActivities('');
+      setActivityDescription('');
+      setFrequencyForNotification('DAILY');
+      setShowFrequencyMenu(false);
+      setHour(12);
+      setMinute(30);
+      setSelectedDateRange(false);
     };
   }, []);
 
@@ -73,6 +80,7 @@ const AddActivityModal = (props: AddActivityModalProps) => {
       reminderMinute: minute,
       notificationId,
       frequency: frequencyForNotification,
+      desicription: activityDescription,
     });
 
     props.onClose();
@@ -96,7 +104,8 @@ const AddActivityModal = (props: AddActivityModalProps) => {
       <Modal visible={props.visible} animationType="fade" transparent={true}>
         <ScrollView
           style={styles.container}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
         >
           <SafeAreaView>
             <View style={styles.titleContainer}>
@@ -241,18 +250,20 @@ const AddActivityModal = (props: AddActivityModalProps) => {
               </TouchableOpacity>
 
               <DateRangeReminderModal
+                activityId={Date.now().toString()}
                 visible={selectedDateRange}
                 onClose={() => setSelectedDateRange(prev => !prev)}
                 onSave={data => {
-                  console.log('selected date range', data);
                   setSelectedDateRange(prev => !prev);
                   setStartDate(data.startDate.split('-').reverse().join('-'));
                   setEndDate(data.endDate.split('-').reverse().join('-'));
+                  setActivityDescription(data.descriptionText);
                 }}
                 startDate={startDate}
                 endDate={endDate}
-                // time={item?.reminderMinute.toString().padStart(2, '0')}
+                time={new Date(hour, minute)}
                 title={'Select start and end date'}
+                description={activityDescription}
               />
             </View>
 
@@ -270,7 +281,7 @@ const AddActivityModal = (props: AddActivityModalProps) => {
               style={styles.saveActivityButton}
               onPress={() => saveActivity()}
             >
-              <Text>Save Activity</Text>
+              <Text style={styles.saveActivityButtonText}>Save Activity</Text>
             </TouchableOpacity>
           </SafeAreaView>
         </ScrollView>
@@ -330,6 +341,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     padding: 10,
     borderRadius: 5,
+    paddingVertical: 14,
   },
   closeIconContainer: {
     height: 20,
@@ -391,6 +403,11 @@ const styles = StyleSheet.create({
     color: colors.secondary,
     fontWeight: 'bold',
   },
+  saveActivityButtonText:{
+    fontSize:16,
+    fontWeight: 'bold',
+    color: colors.secondary,
+  }
 });
 
 export default AddActivityModal;

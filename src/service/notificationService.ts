@@ -7,10 +7,6 @@ import notifee, {
 
 export async function requestNotificationPermission() {
   const settings = await notifee.requestPermission();
-
-  console.log('Notification settings:', settings);
-  console.log('Authorization status:', AuthorizationStatus);
-
   if (settings.authorizationStatus < AuthorizationStatus.AUTHORIZED) {
     throw new Error('Notification permission denied');
   }

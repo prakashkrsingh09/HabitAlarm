@@ -14,6 +14,7 @@ export function isWithinRange(
 
 export function getDateRange(start: string, end: string) {
   const range: any = {};
+  // Dates are expected in YYYY-MM-DD format
   let current = new Date(start);
   const last = new Date(end);
 
@@ -28,18 +29,22 @@ export function getDateRange(start: string, end: string) {
     current.setDate(current.getDate() + 1);
   }
 
+  // Mark start and end dates with special styling
   range[start] = {
     startingDay: true,
     color: colors.primary,
     textColor: colors.secondary,
   };
-  range[end] = { endingDay: true, color: colors.primary, textColor: colors.secondary };
+  range[end] = {
+    endingDay: true,
+    color: colors.primary,
+    textColor: colors.secondary,
+  };
 
   return range;
 }
 
 export function formatDateInWord(date: string[]): string {
-  console.log('date 123: ', date);
   let month = '';
   if (date.length > 0) {
     switch (date[1]) {

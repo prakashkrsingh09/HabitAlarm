@@ -11,6 +11,7 @@ export type Activity = {
   reminderMinute: number;
   notificationId?: string;
   completion: Record<string, boolean>;
+  desicription: string;
 };
 
 type CreateActivityInput = {
@@ -22,6 +23,7 @@ type CreateActivityInput = {
   reminderMinute: number;
   notificationId?: string;
   frequency: string;
+  desicription: string;
 };
 
 type ActivityStore = {

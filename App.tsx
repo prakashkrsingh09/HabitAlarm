@@ -26,35 +26,63 @@ export default function App() {
     setOpenDetailsModal(prev => !prev);
   };
 
-  const renderItem = ({ item }: { item: Activity }) => (
-    <TouchableOpacity
-      style={styles.renderItemContainer}
-      onPress={() => onPressRenderItem(item)}
-    >
-      <View style={styles.renderItemTitle}>
-        <Text>{item.title}</Text>
-        <TouchableOpacity
-          onPress={async () => {
-            // Cancel the notification before deleting the activity
-            if (item.notificationId) {
-              await cancelNotification(item.notificationId);
-            }
-            deteleActivity(item.id);
-          }}
-        >
-          <Icon name="delete" size={20} color="red" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.dateConatiner}>
-        <Text>Start: {item.startDate}</Text>
-        <Text>End: {item.endDate || 'Ongoing'}</Text>
-      </View>
-      <Text>
-        Reminder Time: {item.reminderHour.toString().padStart(2, '0')}:
-        {item.reminderMinute.toString().padStart(2, '0')}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }: { item: Activity }) => {
+    return (
+      <TouchableOpacity
+        style={styles.renderItemContainer}
+        onPress={() => onPressRenderItem(item)}
+      >
+        <View style={styles.renderItemTitle}>
+          <Text style={styles.renderItemTitleText}>{item.title}</Text>
+          <TouchableOpacity
+            onPress={async () => {
+              // Cancel the notification before deleting the activity
+              if (item.notificationId) {
+                await cancelNotification(item.notificationId);
+              }
+              deteleActivity(item.id);
+            }}
+            style={styles.deleteButton}
+          >
+            <Icon name="delete" size={20} color="red" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.descriptionContainer}>
+          <Text>
+            {item.desicription.trim().length > 0
+              ? item.desicription
+              : 'No description'}
+          </Text>
+        </View>
+        <View style={styles.dateConatiner}>
+          <View style={styles.dateConatinerItem}>
+            <Icon name="calendar-month" size={20} color="black" />
+            <Text>Start: {item.startDate}</Text>
+          </View>
+          <View>
+            <Icon name="start" size={20} color="black" />
+          </View>
+          <View style={styles.dateConatinerItem}>
+            <Icon name="calendar-month" size={20} color="black" />
+            <Text>End: {item.endDate || 'Ongoing'}</Text>
+          </View>
+        </View>
+        <View style={styles.reminderTimeContainer}>
+          <Icon name="share-arrival-time" size={20} color="black" />
+          <Text>
+            {`Reminder Time: ${
+              item.reminderHour > 12
+                ? item.reminderHour - 12
+                : item.reminderHour.toString().padStart(2, '0')
+            } : ${item.reminderMinute.toString().padStart(2, '0')} ${
+              item.reminderHour > 11 ? 'PM' : 'AM'
+            }`}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -79,14 +107,19 @@ export default function App() {
       />
 
       <DateRangeReminderModal
+        activityId={selectedItem?.id || ''}
         visible={openDetailsModal}
         onClose={() => setOpenDetailsModal(prev => !prev)}
         onSave={data => {
           console.log(data);
           // setOpenDetailsModal(prev=>!prev)
         }}
-        startDate={selectedItem?.startDate || '24-12-2025'}
-        endDate={selectedItem?.endDate || '10-01-2026'}
+        startDate={
+          selectedItem?.startDate || new Date().toISOString().split('T')[0]
+        }
+        endDate={
+          selectedItem?.endDate || new Date().toISOString().split('T')[0]
+        }
         time={
           selectedItem
             ? new Date(
@@ -99,6 +132,7 @@ export default function App() {
             : undefined
         }
         title={selectedItem?.title?.toString() || ''}
+        description={selectedItem?.desicription?.toString() || ''}
       />
       <FlatList
         data={activities}
@@ -144,14 +178,14 @@ const styles = StyleSheet.create({
   dateConatiner: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    // marginTop: 8,
   },
   renderItemContainer: {
     marginVertical: 3,
     paddingHorizontal: 10,
     borderWidth: 3,
     borderColor: '#ccc',
-    zIndex: 10,
+    paddingVertical: 10,
     borderRadius: 10,
     backgroundColor: colors.secondary,
   },
@@ -159,5 +193,38 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: colors.secondary,
     height: '100%',
+  },
+  dateConatinerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    justifyContent: 'space-between',
+  },
+  renderItemTitleText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  deleteButton: {
+    backgroundColor: '#ff64645f',
+    borderRadius: 15,
+    padding: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+    height: 30,
+  },
+  descriptionContainer: {
+    marginVertical: 5,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 10,
+  },
+  reminderTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    borderRadius: 10,
+    width: '100%',
   },
 });
