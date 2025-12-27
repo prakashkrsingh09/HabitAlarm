@@ -30,8 +30,8 @@ const AddActivityModal = (props: AddActivityModalProps) => {
   const [activities, setActivities] = useState<string>('');
   const [activityDescription, setActivityDescription] = useState<string>('');
   const [selectedDateRange, setSelectedDateRange] = useState(false);
-  const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState<string>(new Date().toLocaleDateString('en-CA'));
+  const [endDate, setEndDate] = useState<string>(new Date().toLocaleDateString('en-CA'));
   const [hour, setHour] = useState(12);
   const [minute, setMinute] = useState(30);
   const [frequencyForNotification, setFrequencyForNotification] = useState<Frequency>('DAILY');

@@ -5,10 +5,17 @@ import notifee, {
   AuthorizationStatus,
 } from '@notifee/react-native';
 
-export async function requestNotificationPermission() {
-  const settings = await notifee.requestPermission();
-  if (settings.authorizationStatus < AuthorizationStatus.AUTHORIZED) {
-    throw new Error('Notification permission denied');
+export async function requestNotificationPermission(): Promise<boolean> {
+  try {
+    const settings = await notifee.requestPermission();
+    if (settings.authorizationStatus < AuthorizationStatus.AUTHORIZED) {
+      console.warn('Notification permission denied or not granted');
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn('Error requesting notification permission', error);
+    return false;
   }
 }
 
@@ -28,28 +35,43 @@ export async function scheduleDailyNotification(
   hour: number,
   minute: number,
 ): Promise<string> {
-  await requestNotificationPermission();
-  await createChannel();
+  const hasPermission = await requestNotificationPermission();
+  if (!hasPermission) {
+    throw new Error('Notification permission denied');
+  }
 
-  const notificationId = await notifee.createTriggerNotification(
-    {
-      title: title,
-      body: body,
-      android: {
-        channelId: 'daily',
-      },
-      ios: {
-        categoryId: 'daily',
-      },
-    },
-    {
-      type: TriggerType.TIMESTAMP,
-      timestamp: getNextTrigger(hour, minute),
-      repeatFrequency: RepeatFrequency.DAILY,
-    },
-  );
+  try {
+    await createChannel();
+  } catch (error) {
+    console.warn('Failed to create notification channel', error);
+    // Continue anyway, channel might already exist
+  }
 
-  return notificationId;
+  try {
+    const notificationId = await notifee.createTriggerNotification(
+      {
+        title: title,
+        body: body,
+        android: {
+          channelId: 'daily',
+          smallIcon: 'ic_launcher_foreground', // Uses app launcher foreground icon
+        },
+        ios: {
+          categoryId: 'daily',
+        },
+      },
+      {
+        type: TriggerType.TIMESTAMP,
+        timestamp: getNextTrigger(hour, minute),
+        repeatFrequency: RepeatFrequency.DAILY,
+      },
+    );
+
+    return notificationId;
+  } catch (error) {
+    console.error('Failed to create trigger notification', error);
+    throw error;
+  }
 }
 
 export async function cancelNotification(notificationId: string) {
@@ -66,6 +88,73 @@ export async function cancelAllNotifications() {
   } catch (error) {
     console.warn('Failed to cancel all notifications', error);
   }
+}
+
+export async function rescheduleAllNotifications(
+  activities: Array<{
+    id: string;
+    title: string;
+    reminderHour: number;
+    reminderMinute: number;
+    notificationId?: string;
+    startDate: string;
+    endDate?: string;
+  }>,
+): Promise<Record<string, string>> {
+  // Request permission first
+  const hasPermission = await requestNotificationPermission();
+  if (!hasPermission) {
+    console.warn('Notification permission not granted, cannot reschedule notifications');
+    return {};
+  }
+
+  // Create channel
+  try {
+    await createChannel();
+  } catch (error) {
+    console.warn('Failed to create notification channel', error);
+    // Continue anyway, channel might already exist
+  }
+
+  const notificationIds: Record<string, string> = {};
+
+  // Cancel all existing notifications first to avoid duplicates
+  try {
+    await cancelAllNotifications();
+  } catch (error) {
+    console.warn('Failed to cancel existing notifications', error);
+  }
+
+  // Re-schedule notifications for all activities
+  for (const activity of activities) {
+    try {
+      // Check if activity is still active (within date range)
+      const today = new Date().toLocaleDateString('en-CA');
+      if (activity.startDate > today) {
+        // Activity hasn't started yet, skip
+        continue;
+      }
+      if (activity.endDate && activity.endDate < today) {
+        // Activity has ended, skip
+        continue;
+      }
+
+      const notificationId = await scheduleDailyNotification(
+        activity.title,
+        'Time to complete your activity',
+        activity.reminderHour,
+        activity.reminderMinute,
+      );
+      notificationIds[activity.id] = notificationId;
+    } catch (error) {
+      console.warn(
+        `Failed to reschedule notification for activity ${activity.id}:`,
+        error,
+      );
+    }
+  }
+
+  return notificationIds;
 }
 
 function getNextTrigger(hour: number, minute: number) {

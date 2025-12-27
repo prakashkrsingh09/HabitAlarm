@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,13 +11,39 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AddActivityModal from './src/components/AddActivityModal';
 import { DateRangeReminderModal } from './src/components/DateRangeReminderModal';
 import { colors } from './src/utils/themes';
-import { cancelNotification } from './src/service/notificationService';
+import {
+  cancelNotification,
+  rescheduleAllNotifications,
+} from './src/service/notificationService';
 
 export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [openDetailsModal, setOpenDetailsModal] = useState(false);
-  const { activities, deteleActivity } = useActivityStore();
+  const { activities, deteleActivity, hasHydrated, updateActivity } =
+    useActivityStore();
   const [selectedItem, setSelectedItem] = useState<Activity | null>(null);
+  const hasInitializedRef = useRef(false);
+
+  // Re-schedule all notifications when app starts and store has hydrated
+  useEffect(() => {
+    if (hasHydrated && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      // Only reschedule if there are activities
+      if (activities.length > 0) {
+        rescheduleAllNotifications(activities)
+          .then(notificationIds => {
+            // Update activities with new notification IDs
+            Object.entries(notificationIds).forEach(([activityId, notificationId]) => {
+              updateActivity(activityId, { notificationId });
+            });
+          })
+          .catch(error => {
+            console.warn('Failed to reschedule notifications on app start', error);
+          });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasHydrated]);
 
   // const { activities, markCompleted, deteleActivity } = useActivityStore();
 
@@ -115,10 +141,10 @@ export default function App() {
           // setOpenDetailsModal(prev=>!prev)
         }}
         startDate={
-          selectedItem?.startDate || new Date().toISOString().split('T')[0]
+          selectedItem?.startDate || new Date().toLocaleDateString('en-CA')
         }
         endDate={
-          selectedItem?.endDate || new Date().toISOString().split('T')[0]
+          selectedItem?.endDate || new Date().toLocaleDateString('en-CA')
         }
         time={
           selectedItem
@@ -129,7 +155,7 @@ export default function App() {
                 selectedItem.reminderHour,
                 selectedItem.reminderMinute,
               )
-            : undefined
+            : new Date()
         }
         title={selectedItem?.title?.toString() || ''}
         description={selectedItem?.desicription?.toString() || ''}

@@ -1,7 +1,7 @@
 import { colors } from './themes';
 
 export function today(): string {
-  return new Date().toISOString().split('T')[0];
+  return new Date().toLocaleDateString('en-CA');
 }
 
 export function isWithinRange(
@@ -19,7 +19,7 @@ export function getDateRange(start: string, end: string) {
   const last = new Date(end);
 
   while (current <= last) {
-    const dateString = current.toISOString().split('T')[0];
+    const dateString = current.toLocaleDateString('en-CA');
 
     range[dateString] = {
       color: colors.primary,

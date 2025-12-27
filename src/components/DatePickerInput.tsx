@@ -43,7 +43,7 @@ export function DatePickerInput({
             setShow(false);
             if (!selectedDate) return;
 
-            const normalized = selectedDate.toISOString().split('T')[0];
+            const normalized = selectedDate.toLocaleDateString('en-CA');
 
             onChange(normalized);
           }}
