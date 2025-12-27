@@ -86,5 +86,5 @@ export function formatDateInWord(date: string[]): string {
     }
   }
 
-  return `${month} ${date[0]}, ${date[2]}`;
+  return `${month} ${date[2]}, ${date[0]}`;
 }
