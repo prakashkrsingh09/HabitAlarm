@@ -1,97 +1,197 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# HabitAlarm 📱
 
-# Getting Started
+A React Native mobile application for creating and managing habit reminders with scheduled notifications. Track your daily activities and get timely reminders to help build consistent habits.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 📋 Features
 
-## Step 1: Start Metro
+- ✅ **Activity Management**: Create, view, and delete activities with custom titles and descriptions
+- 📅 **Date Range Selection**: Set start and end dates for your activities using an intuitive calendar interface
+- ⏰ **Custom Reminders**: Set specific reminder times (hour and minute) for each activity
+- 🔔 **Push Notifications**: Receive daily recurring notifications at your specified times
+- 💾 **Data Persistence**: All activities are saved locally and persist across app restarts
+- 🔄 **Auto Re-scheduling**: Notifications are automatically re-scheduled when the app restarts
+- 📊 **Activity Tracking**: Track completion status for each activity by date
+- 🎨 **Modern UI**: Clean and user-friendly interface built with React Native Paper
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 🛠️ Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **Framework**: React Native 0.83.1
+- **Language**: TypeScript 5.8.3
+- **State Management**: Zustand 5.0.9 (with persistence)
+- **Storage**: AsyncStorage
+- **Notifications**: @notifee/react-native 9.1.8
+- **UI Libraries**:
+  - react-native-paper
+  - react-native-vector-icons
+  - react-native-calendars
+  - @react-native-community/datetimepicker
 
+## 📦 Prerequisites
+
+- Node.js >= 20
+- React Native development environment set up
+- Android Studio (for Android development)
+- Xcode (for iOS development, macOS only)
+
+## 🚀 Installation
+
+1. **Clone the repository**
+   ```sh
+   git clone <repository-url>
+   cd HabitAlarm
+   ```
+
+2. **Install dependencies**
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **iOS Setup** (macOS only)
+   ```sh
+   # Install CocoaPods dependencies
+   bundle install
+   bundle exec pod install
+   ```
+
+## 🏃 Running the App
+
+### Start Metro Bundler
 ```sh
-# Using npm
 npm start
-
-# OR using Yarn
+# or
 yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
+### Run on Android
 ```sh
-# Using npm
 npm run android
-
-# OR using Yarn
+# or
 yarn android
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
+### Run on iOS
 ```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
 npm run ios
-
-# OR using Yarn
+# or
 yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 📱 Usage
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Creating an Activity
 
-## Step 3: Modify your app
+1. Tap the **+** button in the top right corner
+2. Enter an activity title (required)
+3. Add an optional description
+4. Select a frequency (Daily, Weekly, or Hourly)
+5. Choose start and end dates using the calendar picker
+6. Set your reminder time
+7. Tap "Save Activity"
 
-Now that you have successfully run the app, let's make changes!
+### Managing Activities
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- **View Details**: Tap on any activity to view its details
+- **Delete Activity**: Tap the delete icon on any activity card
+- **Notifications**: Notifications are automatically scheduled when you create an activity
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Notifications
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- Notifications are scheduled daily at your specified reminder time
+- Only active activities (within their date range) receive notifications
+- Notifications are automatically re-scheduled when you restart the app
+- Make sure to grant notification permissions when prompted
 
-## Congratulations! :tada:
+## 📁 Project Structure
 
-You've successfully run and modified your React Native App. :partying_face:
+```
+HabitAlarm/
+├── src/
+│   ├── components/
+│   │   ├── AddActivityModal.tsx      # Modal for creating activities
+│   │   ├── DateRangeReminderModal.tsx # Calendar date range picker
+│   │   ├── DatePickerInput.tsx        # Date picker component
+│   │   └── TimePickerInput.tsx        # Time picker component
+│   ├── service/
+│   │   └── notificationService.ts     # Notification scheduling logic
+│   ├── store/
+│   │   └── activityStore.ts           # Zustand store with persistence
+│   ├── types/
+│   │   └── Activity.ts                # TypeScript type definitions
+│   └── utils/
+│       ├── date.ts                    # Date utility functions
+│       └── themes.ts                  # App color themes
+├── android/                           # Android native code
+├── ios/                               # iOS native code
+├── App.tsx                            # Main app component
+└── package.json
+```
 
-### Now what?
+## 🔧 Available Scripts
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+- `npm start` - Start Metro bundler
+- `npm run android` - Run on Android device/emulator
+- `npm run ios` - Run on iOS simulator/device
+- `npm test` - Run tests
+- `npm run lint` - Lint code with ESLint
 
-# Troubleshooting
+## 🔔 Notification Features
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+- **Daily Recurring**: Notifications repeat every day at the specified time
+- **Smart Scheduling**: Only schedules notifications for activities within their active date range
+- **Auto Recovery**: Automatically re-schedules all notifications when the app restarts
+- **Permission Handling**: Gracefully handles notification permission requests
 
-# Learn More
+## 💾 Data Storage
 
-To learn more about React Native, take a look at the following resources:
+- All activities are stored locally using AsyncStorage
+- Data persists across app restarts
+- No internet connection required
+- Data is stored in JSON format
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 🐛 Troubleshooting
+
+### Notifications Not Firing
+
+1. **Check Permissions**: Ensure notification permissions are granted in device settings
+2. **Battery Optimization**: Disable battery optimization for the app (Android)
+3. **Time Check**: Make sure the reminder time hasn't already passed for today (it will fire tomorrow)
+4. **Date Range**: Verify the activity is within its start and end date range
+
+### Build Issues
+
+- **Android**: Clean build folder: `cd android && ./gradlew clean && cd ..`
+- **iOS**: Clean build: `cd ios && rm -rf build && cd ..`
+- **Metro**: Reset cache: `npm start -- --reset-cache`
+
+### Common Issues
+
+- **Pod Install**: If iOS build fails, run `bundle exec pod install` in the `ios` directory
+- **Node Version**: Ensure you're using Node.js >= 20
+- **Watchman**: Install Watchman for better file watching: `brew install watchman` (macOS)
+
+## 📝 Development Notes
+
+- Date format: Uses `toLocaleDateString('en-CA')` which returns `YYYY-MM-DD` format
+- State management: Uses Zustand with persistence middleware
+- Notifications: Uses Notifee for cross-platform notification support
+- Icons: Material Icons from react-native-vector-icons
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🙏 Acknowledgments
+
+- React Native community
+- Notifee for notification support
+- Zustand for state management
+
+---
+
+Made with ❤️ using React Native
